@@ -1,4 +1,4 @@
-from helper import local_binary_pattern, euclidian_distance, User_IDs, hist
+from helper import local_binary_pattern, euclidean_distance, User_IDs, hist
 
 import os
 import urllib
@@ -247,7 +247,6 @@ background = canvas.create_image(
 firebase = pyrebase.initialize_app(firebase_config)
 
 storage = firebase.storage()
-print(type(storage))
 window.resizable(False, False)
 if __name__ == "__main__":
     window.mainloop()

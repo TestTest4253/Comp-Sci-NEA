@@ -111,7 +111,7 @@ def hist(array):
 
     return hist
 
-def euclidian_distance(lbph1,lbph2):
+def euclidean_distance(lbph1,lbph2):
 
     """
     Inputs:
@@ -119,7 +119,7 @@ def euclidian_distance(lbph1,lbph2):
         lbph2 {Type: array} Numpy array of the generated histogram for the second image
 
     Outputs:
-        distance {Type: Float} Euclidian distance between the points of each histogram
+        distance {Type: Float} Euclidean distance between the points of each histogram
     """
 
     distance = np.sqrt(np.sum(np.square(lbph1 - lbph2)))
