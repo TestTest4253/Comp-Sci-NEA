@@ -1,0 +1,22 @@
+Problem Definition
+
+Over the years, the digital gap between humans and computers has decreased drammatically. With more programs requiring an account to be created, the need for a more secure method of keeping your accounts safe has increased. This has lead to me looking into facial authentication as the new way of storing accounts. This leads to you not having to remember any of your passwords, which will remove people forgetting their passwords and increasing the security of their accounts by not having to write their passwords down on piece of paper or on a password manager. Every face is biometrically different therefore can not be replicated by someone else in order to gain access to unauthorised information. As more people have phones and laptops, the percentage of people who have webcams/cameras increases, this leads to being able to access their faces to utilise biometrics. 
+
+My Clients
+
+My typical users will be IT staff of companies. This is due to the data that is being accessed needing to be secure from unauthorised access. Utilising my software means that the users will be able to quickly access their accounts via a secure method (facial authentication). In the workforce, most companies typically require you to change your password once every 4 months, this can lead to people forgetting what their current password is and having to have their password written down elsewhere. If the client switches to using facial recognition, the security of their account will increase whilst also being quicker to access. This can lead to the productivity of employees increasing.
+
+User requirements
+
+The user will be able to register their face to the database
+The user will be able to login using their account
+The user will be able to make an account under the system
+
+System Requirements
+The system will be able to correctly identify a set of pre-defined faces 
+The system will be able to predict with a certainty of over 85%
+The system will be able to work correctly over multiple devices
+The system will be able to backup data to the cloud
+
+Hardware Requirements
+The system requires a webcam

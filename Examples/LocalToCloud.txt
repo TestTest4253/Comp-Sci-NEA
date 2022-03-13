@@ -1,0 +1,10 @@
+folders = os.listdirectory(FACES)
+FOR folder in folders DO
+    TRY
+        download(Faces/folder/myimage1.png) as "Downloaded.txt"
+        os.remove("Downloaded.txt")
+    EXCEPT
+        FOR image in directory THEN
+            Cloud.put(image)
+        ENDFOR
+ENDFOR

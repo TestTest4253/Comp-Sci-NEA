@@ -1,0 +1,12 @@
+FUNCTION UpdateGUI(canvas, full_name)
+    tk.lift(canvas, Above=None)
+    TRY
+        download(Faces/full_name/myimage1.png) as "tmp/downloaded.txt"
+    EXCEPT
+        canvas.face_recognition.lift()
+    canvas.logout.lift()
+    canvas.info.lift()
+    canvas.first_name.lower()
+    canvas.last_name.lower()
+    canvas.get_started.lower()
+ENDFUNCTION

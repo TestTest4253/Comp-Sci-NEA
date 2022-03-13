@@ -1,0 +1,37 @@
+while True:
+    _, frame = cap.read()
+    grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(
+        grey, 1.1, 5)
+    for (x, y, w, h) in faces:
+        roi_grey = grey[y:y+h, x:x+w]
+        roi_colour = frame[y:y+h, x:x+w]
+
+        if detect == True:
+            colour = (255, 0, 0)
+            stroke = 2
+            cv2.rectangle(frame, (x, y), (x+w, y+h), colour, stroke)
+            img_item = "myimage"+str(num)+".png"
+            cv2.imwrite(img_item, roi_colour)
+            num += 1
+            if num >= 100:
+                exit()
+    # Displaying the frame
+    cv2.imshow("frame", frame)
+    if cv2.waitKey(100) == ord("q"):
+        break
+cap.release()
+cv2.destroyAllWindows()
+
+WHILE True DO
+    Frame = read(Capture)
+    Grey = Frame.convertGreyscale()
+    faces = detectFaces(Grey)
+    FOR iterator, face in Faces DO
+        drawRect(frame, (startx,starty), (endx,endy), colour)
+        img_name = "myimage(iterator).png"
+        IF iterator >= 100 then
+            exit
+        ENDIF
+    ENDFOR
+ENDWHILE

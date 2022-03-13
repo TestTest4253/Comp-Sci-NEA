@@ -1,0 +1,20 @@
+TRY
+    IMPORT tkinter
+EXCEPT ImportError
+    run(-m pip install tkinter)
+
+TRY 
+    IMPORT pyrebase
+EXCEPT ImportError
+    run(-m pip install pyrebase)
+
+TRY
+    IMPORT cv2
+EXCEPT ImportError
+    run(-m pip install cv2)
+
+TRY
+    IMPORT PIL
+EXCEPT ImportError
+    run(-m pip install PIL)
+    

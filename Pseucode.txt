@@ -1,0 +1,3 @@
+class Webcam():
+    initiate(self, window, capture):
+        self.
