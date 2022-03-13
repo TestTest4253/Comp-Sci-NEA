@@ -33,5 +33,3 @@ for x in range(len(Hists)):
     if val < Lowest_val:
         Lowest_val = val
         person = Labels[x]
-
-print(f"Person in image is: {person}")
