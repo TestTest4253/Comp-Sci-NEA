@@ -1,3 +1,5 @@
+from helper import local_binary_pattern, euclidian_distance, User_IDs, hist
+
 import os
 import urllib
 from tkinter import *
@@ -26,56 +28,6 @@ CLOUD_USER_IDS = "Credentials/UserIDs.txt"
 FACES_DIRECTORY = "FacialRecognition/Faces"
 
 # Functions
-
-
-def User_IDs(first_name, last_name, storage, LOCAL_IDS, CLOUD_IDS):
-    inputted_name = first_name + " " + last_name
-    if DEBUG:
-        print(inputted_name)
-    user_ids = []
-    temporary_file = open(LOCAL_IDS, "w")
-    temporary_file.close()
-    names = []
-    exist = False
-    try:
-        cloud_file = urllib.request.urlopen(
-            storage.child(CLOUD_IDS).get_url(None)).read()
-    except:
-        storage.child(CLOUD_IDS).put(LOCAL_IDS)
-        cloud_file = urllib.request.urlopen(
-            storage.child(CLOUD_IDS).get_url(None)).read()
-    vals = cloud_file.decode("utf-8").split("\r\n")
-    for x in vals:
-        if x != "":
-            element = x.split(" ")
-            uuid = element[0]
-            name = element[1] + " " + element[2]
-            names.append([uuid, name.rstrip()])
-            if DEBUG:
-                print(f"UUID is {uuid} and name is", name)
-            user_ids.append(element[0])
-    if len(user_ids) == 0:
-        next_user = 1
-        user_ids.append(next_user)
-    else:
-        for x in names:
-            if DEBUG:
-                print(x[1], "is ", inputted_name,
-                      "equals", x[1] == inputted_name)
-            if x[1].rstrip() == inputted_name:
-                exist = True
-        if not exist:
-            next_user = int(user_ids[-1]) + 1
-            user_ids.append(next_user)
-    if not exist:
-        name = inputted_name
-        File = open(LOCAL_IDS, "a")
-        File.write(cloud_file.decode("utf-8"))
-        File.write(str(user_ids[-1]) + " " + name + "\n")
-        File.close()
-        storage.child(CLOUD_IDS).put(LOCAL_IDS)
-    os.remove(LOCAL_IDS)
-
 
 def GetStarted(canvas, test_recognition,
                face_recognition, logout, info, first_name, last_name, get_started, storage, LOCAL_USER_IDS, CLOUD_USER_IDS):
@@ -119,7 +71,7 @@ def log_out(canvas2, test_recognition,
     first_name.lift()
     last_name.lift()
     get_started.lift()
-    backup_files(storage, faces_dir)
+    #backup_files(storage, faces_dir)
 
 
 def facial_recognition():
@@ -129,16 +81,11 @@ def facial_recognition():
 
 
 def add_user(first_name, last_name):
-    if DEBUG:
-        print("Adding user")
     name = first_name.get().capitalize() + " " + last_name.get().capitalize()
     try:
         os.mkdir(f"FacialRecognition/Faces/{name}")
     except FileExistsError:
-        if DEBUG:
-            print("Directory already exists")
-    if DEBUG:
-        print("Directory made")
+        pass
 
 
 def backup_files(storage, directory):
@@ -300,7 +247,7 @@ background = canvas.create_image(
 firebase = pyrebase.initialize_app(firebase_config)
 
 storage = firebase.storage()
-
+print(type(storage))
 window.resizable(False, False)
 if __name__ == "__main__":
     window.mainloop()
