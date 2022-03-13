@@ -3,14 +3,19 @@ import math
 
 
 def local_binary_pattern(image):
+
+    """
+    Inputs:
+        image {type: Array[r,c]} Greyscale image of the intended image to be calculated
+
+    Outputs:
+        FinalArray {type: List[r,c]} Array of the LBP points for each pixel 
+    """
+
+
     Width, Height = math.ceil((len(image[0]))), math.ceil((len(image)))
     array = image.tolist()
-    SingleRow = []
-    rows = []
-    Row = []
-    grids = []
-    LocalBinaryImageList = []
-    FinalArray = []
+    SingleRow, rows, Row, grids, LocalBinaryImageList, FinalArray = [], [], [], [], [], []
 
     # Splits photo into 3 long groupings
     for row in range(len(array)):
@@ -81,3 +86,25 @@ def local_binary_pattern(image):
         FinalArray.append(LocalBinaryImageList[x:x + Height])
 
     return FinalArray
+
+def hist(array):
+
+    """
+    Inputs:
+        array {Type: array[r,c]} Numpy array of the LBP points
+
+    Outputs:
+        hist {Type: array} Numpy array of the generated histogram for the points
+
+    """
+
+    array = np.array(array, np.uint8)
+    (hist, _) = np.histogram(array.ravel(), bins = np.arange(0,11))
+    hist = hist.astype("float")
+    hist /= (hist.sum() + 1e-6)
+
+    return hist
+
+def euclidian_distance(lbp1,lbp2):
+    distance = np.sqrt(np.sum(np.square(lbp1 - lbp2)))
+    return distance
