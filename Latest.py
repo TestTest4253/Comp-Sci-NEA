@@ -1,13 +1,14 @@
-from helper import local_binary_pattern, euclidean_distance, User_IDs, hist
+from helper import local_binary_pattern, euclidean_distance, User_IDs, hist, backup_files
 
 import os
 import urllib
 from tkinter import *
-from VideoCapture import Webcam
+import tkinter as tk
 import pyrebase
-import tkinter
 import cv2
 import time
+import threading
+from PIL import Image, ImageTk
 
 global DEBUG
 DEBUG = False
@@ -30,7 +31,7 @@ FACES_DIRECTORY = "FacialRecognition/Faces"
 # Functions
 
 def GetStarted(canvas, test_recognition,
-               face_recognition, logout, info, first_name, last_name, get_started, storage, LOCAL_USER_IDS, CLOUD_USER_IDS):
+               face_recognition, logout, backup, first_name, last_name, get_started, storage, LOCAL_USER_IDS, CLOUD_USER_IDS):
     if DEBUG:
         print("Getting Started")
     if first_name.get() and last_name.get() != "":
@@ -39,7 +40,7 @@ def GetStarted(canvas, test_recognition,
         full_name = first_name + " " + last_name
         User_IDs(first_name, last_name,
                  storage, LOCAL_USER_IDS, CLOUD_USER_IDS)
-        tkinter.Misc.lift(canvas, aboveThis=None)
+        tk.Misc.lift(canvas, aboveThis=None)
         test_recognition.lift()
         try:
             storage.child(f"Faces/{full_name}/myimage1.png").download(
@@ -48,37 +49,32 @@ def GetStarted(canvas, test_recognition,
         except:
             face_recognition.lift()
         logout.lift()
-        info.lift()
+        backup.lift()
         first_name.lower()
         last_name.lower()
         get_started.lower()
 
-
-def user_info():
-    if DEBUG:
-        print("Showing User Profile")
-
-
 def log_out(canvas2, test_recognition,
-            face_recognition, logout, info, first_name, last_name, get_started, faces_dir):
+            face_recognition, logout, backup, first_name, last_name, get_started, faces_dir):
     if DEBUG:
         print("Logging out")
-    tkinter.Misc.lift(canvas2, aboveThis=None)
+    tk.Misc.lift(canvas2, aboveThis=None)
     test_recognition.lower()
     face_recognition.lower()
     logout.lower()
-    info.lower()
+    backup.lower()
     first_name.lift()
     last_name.lift()
     get_started.lift()
-    #backup_files(storage, faces_dir)
 
-
-def facial_recognition():
-    if DEBUG:
-        print("booting camera")
-    Webcam(window, cv2.VideoCapture(0, cv2.CAP_DSHOW))
-
+def facial_recognition(canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button):
+    tk.Misc.lift(canvas3, aboveThis=None)
+    backup.lower()
+    logout.lower()
+    face_recognition.lower()
+    test_recognition.lower()
+    Start_camera_button.lift()
+    Stop_camera_button.lift()
 
 def add_user(first_name, last_name):
     name = first_name.get().capitalize() + " " + last_name.get().capitalize()
@@ -87,35 +83,44 @@ def add_user(first_name, last_name):
     except FileExistsError:
         pass
 
+def start_button(videoloop_stop):
+    thread = threading.Thread(target = videoLoop, args = (videoloop_stop, )).start()
 
-def backup_files(storage, directory):
-    folders = os.listdir(directory)
-    for folder in folders:
-        try:
-            storage.child(f"Faces/{folder}/myimage1.png").download(
-                f"Faces/{folder}/myimage1.png", "Downloaded.txt")
-            os.remove("Downloaded.txt")
-            if DEBUG:
-                print(f"{folder} exists")
-        except:
-            for image in os.listdir(directory+"\\"+folder):
-                cloud_path = f"Faces/{folder}/{image}"
-                local_path = directory+"\\"+folder+"\\"+image
-                storage.child(cloud_path).put(local_path)
-                if DEBUG:
-                    print(f"Uploading {image}")
-                time.sleep(0.15)
+def stop_button(videoloop_stop):
+    videoloop_stop[0] = True
 
+def videoLoop(mirror = False):
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 400)
 
+    while True:
+        ret, to_draw = cap.read()
+        if mirror == True:
+            to_draw = to_draw[:,::-1]
+        image = cv2.cvtColor(to_draw, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image)
+        tkimage = ImageTk.PhotoImage(image)
+        panel = tk.Label(image=tkimage)
+        panel.image = tkimage
+        panel.place(x=50, y=50)
+
+        if videoloop_stop[0]:
+            videoloop_stop[0] = False
+            image.save("Swag.png")
+            panel.destroy()
+            break
+
+videoloop_stop = [False]
 # GUI Creation
-window = Tk()
+root = Tk()
 
-window.geometry("1000x600")
-window.configure(bg="#ffffff")
+root.geometry("1000x600")
+root.configure(bg="#ffffff")
 
 # Welcome Screen
 canvas = Canvas(
-    window,
+    root,
     bg="#ffffff",
     height=600,
     width=1000,
@@ -142,7 +147,7 @@ test_recognition = Button(
     image=test_recognition_img,
     borderwidth=0,
     highlightthickness=0,
-    command=facial_recognition,
+    command=lambda: facial_recognition(canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button),
     relief="flat")
 
 test_recognition.place(
@@ -156,7 +161,7 @@ logout = Button(
     borderwidth=0,
     highlightthickness=0,
     command=lambda: log_out(canvas2, test_recognition,
-                            face_recognition, logout, info, first_name, last_name, get_started, FACES_DIRECTORY),
+                            face_recognition, logout, backup, first_name, last_name, get_started, FACES_DIRECTORY),
     relief="flat")
 
 logout.place(
@@ -164,22 +169,62 @@ logout.place(
     width=126,
     height=53)
 
-info_img = PhotoImage(file=path_of_gui + f"Welcome_Info.png")
-info = Button(
-    image=info_img,
+backup_img = PhotoImage(file=path_of_gui + f"Welcome_info.png")
+backup = Button(
+    image=backup_img,
     borderwidth=0,
     highlightthickness=0,
-    command=user_info,
+    command=lambda: backup_files(storage, FACES_DIRECTORY),
     relief="flat")
 
-info.place(
+backup.place(
     x=970, y=570,
     width=30,
     height=30)
 
+canvas3 = Canvas(
+    root,
+    bg="#ffffff",
+    height=600,
+    width=1000,
+    bd=0,
+    highlightthickness=0,
+    relief="ridge")
+
+webcam_background_img = PhotoImage(file = path_of_gui+f"Webcambackground.png")
+background = canvas3.create_image(
+    500.0, 300.0,
+    image=webcam_background_img)
+
+Start_camera_img = PhotoImage(file = path_of_gui+f"StartCamera.png")
+Start_camera_button = Button(
+    image = Start_camera_img,
+    borderwidth = 0,
+    highlightthickness = 0,
+    command = lambda: start_button(videoloop_stop),
+    relief = "flat")
+
+Start_camera_button.place(
+    x = 88, y = 534,
+    width = 400,
+    height = 49)
+
+Stop_camera_img = PhotoImage(file = path_of_gui+f"StopCamera.png")
+Stop_camera_button = Button(
+    image = Stop_camera_img,
+    borderwidth = 0,
+    highlightthickness = 0,
+    command = lambda: stop_button(videoloop_stop),
+    relief = "flat")
+
+Stop_camera_button.place(
+    x = 516, y = 534,
+    width = 400,
+    height = 49)
+
 # Login Screen
 canvas2 = Canvas(
-    window,
+    root,
     bg="#ffffff",
     height=600,
     width=1000,
@@ -224,7 +269,7 @@ get_started = Button(
     borderwidth=0,
     highlightthickness=0,
     command=lambda: GetStarted(canvas, test_recognition,
-                               face_recognition, logout, info, first_name, last_name, get_started, storage, LOCAL_USER_IDS, CLOUD_USER_IDS),
+                               face_recognition, logout, backup, first_name, last_name, get_started, storage, LOCAL_USER_IDS, CLOUD_USER_IDS),
     relief="flat")
 
 get_started.place(
@@ -243,10 +288,14 @@ background = canvas.create_image(
     416.5, 300.0,
     image=background_img)
 
+# Facial Recognition Screen
+
+
+
 # Cloud Storage
 firebase = pyrebase.initialize_app(firebase_config)
 
 storage = firebase.storage()
-window.resizable(False, False)
+root.resizable(False, False)
 if __name__ == "__main__":
-    window.mainloop()
+    root.mainloop()

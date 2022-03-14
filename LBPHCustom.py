@@ -15,7 +15,7 @@ GreyImage3 = cv2.cvtColor(
 GreyImage4 = cv2.cvtColor(
     np.array(Image.open("Faces/Seb Atkins/myImage3.png")), cv2.COLOR_RGB2GRAY)
 
-Labels = ["Seb", "James", "Oscar", "Donald Trump", "Hillary Clinton", "Rowan Atkinson", "Robin Driscoll"]
+Labels = ["Seb", "James", "Oscar"]
 Lowest_val = 1000000
 
 lbp1 = hist(local_binary_pattern(GreyImage))
@@ -34,7 +34,7 @@ TargetHist = hist(local_binary_pattern(People[0]))
 Hists = []
 for person in People:
     Hists.append(hist(local_binary_pattern(person)))
-
+    
 for x in range(len(Hists)):
     val = euclidean_distance(TargetHist, Hists[x])
     print(f"val for {Labels[x]} is {val} ")

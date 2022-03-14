@@ -179,3 +179,17 @@ def User_IDs(first_name, last_name, storage, LOCAL_IDS, CLOUD_IDS):
         File.close()
         storage.child(CLOUD_IDS).put(LOCAL_IDS)
     os.remove(LOCAL_IDS)
+
+def backup_files(storage, directory):
+    folders = os.listdir(directory)
+    for folder in folders:
+        try:
+            storage.child(f"Faces/{folder}/myimage1.png").download(
+                f"Faces/{folder}/myimage1.png", "Downloaded.txt")
+            os.remove("Downloaded.txt")
+        except:
+            for image in os.listdir(directory+"\\"+folder):
+                cloud_path = f"Faces/{folder}/{image}"
+                local_path = directory+"\\"+folder+"\\"+image
+                storage.child(cloud_path).put(local_path)
+                time.sleep(0.15)
