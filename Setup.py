@@ -35,12 +35,12 @@ except ImportError:
     subprocess.run([sys.executable, "-m", "pip", "install",
                    "pillow"], stdout=devnull, stderr=devnull)
 
-"""try:
-    import pickle
+try:
+    import matplotlib
 except ImportError:
     devnull = open(os.devnull, "w")
-    print("Installing pickle")
+    print("Installing matplotlib")
     subprocess.run([sys.executable, "-m", "pip", "install",
-                   "pickle"], stdout=devnull, stderr=devnull)"""
+                   "matplotlib"], stdout=devnull, stderr=devnull)
 
 print("All modules installed, you may now run the original code")

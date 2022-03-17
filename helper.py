@@ -14,7 +14,7 @@ def local_binary_pattern(image):
 
     """
     Inputs:
-        image {type: Array[r,c]} Greyscale image of the intended image to be calculated
+        image {type: Array[r,c]} image of the intended image to be calculated
 
     Outputs:
         FinalArray {type: List[r,c]} Array of the LBP points for each pixel 
