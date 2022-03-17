@@ -18,8 +18,17 @@ GreyImage4 = cv2.cvtColor(
 Labels = ["Seb", "James", "Oscar"]
 Lowest_val = 1000000
 
+# Remove if wanting to display the LBP image
+"""
+img = local_binary_pattern(cv2.cvtColor(np.array(Image.open("Swag2.png")), cv2.COLOR_RGB2GRAY))
+plt.imshow(img, cmap = "gray", vmin = 0, vmax = 255)
+plt.show()
+"""
+
+# Remove if wanting to guess the person
+"""
 lbp1 = hist(local_binary_pattern(GreyImage))
-lbp2 = hist(local_binary_pattern(GreyImage2))
+lbp2 = hist(local_binary_pattern(G"reyImage2))
 lbp3 = hist(local_binary_pattern(GreyImage3))
 lbp4 = hist(local_binary_pattern(GreyImage4))
 
@@ -43,8 +52,10 @@ for x in range(len(Hists)):
         person = Labels[x]
 
 print(f"Person in image is: {person}, target was {Labels[0]}")
+"""
 
 
+# Remove if wanting to print the histograms
 """
 vals = range(len(lbp1))
 plt.figure(figsize=(10,8))

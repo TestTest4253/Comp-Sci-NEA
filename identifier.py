@@ -8,7 +8,6 @@ cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
 num = 1
-labels = {}
 recogniser = cv2.face.LBPHFaceRecognizer_create()
 
 while True:

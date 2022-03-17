@@ -1,6 +1,8 @@
 # For the Texture analysis
 import numpy as np
 import math
+from PIL import Image
+import cv2
 
 # For the Datastore
 import os
@@ -18,7 +20,7 @@ def local_binary_pattern(image):
         FinalArray {type: List[r,c]} Array of the LBP points for each pixel 
     """
 
-
+    image = cv2.cvtColor(np.array(Image.open(image), np.uint8) , cv2.COLOR_RGB2GRAY)
     Width, Height = math.ceil((len(image[0]))), math.ceil((len(image)))
     array = image.tolist()
     SingleRow, rows, Row, grids, LocalBinaryImageList, FinalArray = [], [], [], [], [], []
@@ -153,10 +155,10 @@ def User_IDs(first_name, last_name, storage, LOCAL_IDS, CLOUD_IDS):
         storage.child(CLOUD_IDS).put(LOCAL_IDS)
         cloud_file = urllib.request.urlopen(
             storage.child(CLOUD_IDS).get_url(None)).read()
-    vals = cloud_file.decode("utf-8").split("\r\n")
+    vals = cloud_file.decode("utf-8").split("\r\n") # Converts the web version to a string format
     for x in vals:
         if x != "":
-            element = x.split(" ")
+            element = x.split(" ") # Breaks line into ID and their name
             uuid = element[0]
             name = element[1] + " " + element[2]
             names.append([uuid, name.rstrip()])
@@ -181,6 +183,13 @@ def User_IDs(first_name, last_name, storage, LOCAL_IDS, CLOUD_IDS):
     os.remove(LOCAL_IDS)
 
 def backup_files(storage, directory):
+    """
+    Inputs:
+        storage {Type: class} 
+        directory {Type: string} File path for the face directory
+    Outputs:
+        None
+    """
     folders = os.listdir(directory)
     for folder in folders:
         try:

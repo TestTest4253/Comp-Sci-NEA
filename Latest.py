@@ -1,4 +1,5 @@
 from helper import local_binary_pattern, euclidean_distance, User_IDs, hist, backup_files
+from RecognitionInImages import Detect_Face
 
 import os
 import urllib
@@ -26,7 +27,10 @@ firebase_config = {"apiKey": "AIzaSyDbs8Yl971Tqhu4VRXHn3kpRhORmUIk-oo",
 path_of_gui = "Assets/"
 LOCAL_USER_IDS = "tmp/UserIDs.txt"
 CLOUD_USER_IDS = "Credentials/UserIDs.txt"
-FACES_DIRECTORY = "FacialRecognition/Faces"
+FACES_DIRECTORY = "Faces"
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
+num = 0
+iter = 0
 
 # Functions
 
@@ -76,38 +80,48 @@ def facial_recognition(canvas3, backup, logout, face_recognition, test_recogniti
     Start_camera_button.lift()
     Stop_camera_button.lift()
 
-def add_user(first_name, last_name):
+def add_user(first_name, last_name, canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button):
     name = first_name.get().capitalize() + " " + last_name.get().capitalize()
     try:
-        os.mkdir(f"FacialRecognition/Faces/{name}")
+        os.mkdir(f"Faces/{name}")
     except FileExistsError:
         pass
+    tk.Misc.lift(canvas3, aboveThis=None)
+    backup.lower()
+    logout.lower()
+    face_recognition.lower()
+    test_recognition.lower()
+    Start_camera_button.lift()
+    Stop_camera_button.lift()
 
-def start_button(videoloop_stop):
-    thread = threading.Thread(target = videoLoop, args = (videoloop_stop, )).start()
 
-def stop_button(videoloop_stop):
+def start_button(videoloop_stop, user):
+    thread = threading.Thread(target = videoLoop, args = (user, videoloop_stop, )).start()
+
+def stop_button(videoloop_stop, user):
     videoloop_stop[0] = True
+    lbp = local_binary_pattern(f"Faces/{user}/myImage0.png")
+    histo = hist(lbp)
 
-def videoLoop(mirror = False):
+def videoLoop(user, mirror = False):
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 600)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 400)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 832)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 518)
 
     while True:
-        ret, to_draw = cap.read()
+        _, frame = cap.read()
         if mirror == True:
-            to_draw = to_draw[:,::-1]
-        image = cv2.cvtColor(to_draw, cv2.COLOR_BGR2RGB)
-        image = Image.fromarray(image)
-        tkimage = ImageTk.PhotoImage(image)
+            frame = frame[::-1]
+        Detect_Face(frame, user)
+        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image = Image.fromarray(image) # PIL image format
+        tkimage = ImageTk.PhotoImage(image) # Swapped to tkinter format
         panel = tk.Label(image=tkimage)
         panel.image = tkimage
-        panel.place(x=50, y=50)
+        panel.place(x=84, y=0)
 
         if videoloop_stop[0]:
             videoloop_stop[0] = False
-            image.save("Swag.png")
             panel.destroy()
             break
 
@@ -134,7 +148,7 @@ face_recognition = Button(
     image=face_recognition_img,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: add_user(first_name, last_name),
+    command=lambda: add_user(first_name, last_name, canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button),
     relief="flat")
 
 face_recognition.place(
@@ -191,17 +205,12 @@ canvas3 = Canvas(
     highlightthickness=0,
     relief="ridge")
 
-webcam_background_img = PhotoImage(file = path_of_gui+f"Webcambackground.png")
-background = canvas3.create_image(
-    500.0, 300.0,
-    image=webcam_background_img)
-
-Start_camera_img = PhotoImage(file = path_of_gui+f"StartCamera.png")
+Start_camera_img = PhotoImage(file=path_of_gui + f"StartCamera.png")
 Start_camera_button = Button(
     image = Start_camera_img,
     borderwidth = 0,
     highlightthickness = 0,
-    command = lambda: start_button(videoloop_stop),
+    command = lambda: start_button(videoloop_stop, "user"),
     relief = "flat")
 
 Start_camera_button.place(
@@ -209,12 +218,12 @@ Start_camera_button.place(
     width = 400,
     height = 49)
 
-Stop_camera_img = PhotoImage(file = path_of_gui+f"StopCamera.png")
+Stop_camera_img = PhotoImage(file=path_of_gui + f"StopCamera.png")
 Stop_camera_button = Button(
     image = Stop_camera_img,
     borderwidth = 0,
     highlightthickness = 0,
-    command = lambda: stop_button(videoloop_stop),
+    command = lambda: stop_button(videoloop_stop, "user"),
     relief = "flat")
 
 Stop_camera_button.place(
@@ -277,25 +286,27 @@ get_started.place(
     width=153,
     height=49)
 
+background_img = PhotoImage(file=path_of_gui + f"Welcome_Background.png")
+background = canvas.create_image(
+    416.5, 300.0,
+    image=background_img)
 
 background_img2 = PhotoImage(file=path_of_gui + f"Login_Background.png")
 background = canvas2.create_image(
     508.5, 300.0,
     image=background_img2)
 
-background_img = PhotoImage(file=path_of_gui + f"Welcome_Background.png")
-background = canvas.create_image(
-    416.5, 300.0,
-    image=background_img)
 
-# Facial Recognition Screen
-
-
+background_img3 = PhotoImage(file=path_of_gui + f"WebcamBackground.png")
+background = canvas3.create_image(
+    500.0, 300.0,
+    image=background_img3)
 
 # Cloud Storage
 firebase = pyrebase.initialize_app(firebase_config)
 
 storage = firebase.storage()
 root.resizable(False, False)
+
 if __name__ == "__main__":
     root.mainloop()
