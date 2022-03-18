@@ -16,7 +16,7 @@ Lowest_val = 1000000
 
 # Remove if wanting to display the LBP image
 """
-img = local_binary_pattern(cv2.cvtColor(np.array(Image.open("Swag2.png")), cv2.COLOR_RGB2GRAY))
+img = local_binary_pattern("Swag2.png")
 plt.imshow(img, cmap = "gray", vmin = 0, vmax = 255)
 plt.show()
 """
@@ -26,8 +26,8 @@ plt.show()
 lbp1 = hist(local_binary_pattern(GreyImage))
 lbp2 = hist(local_binary_pattern(GreyImage2))
 lbp3 = hist(local_binary_pattern(GreyImage3))
-lbp4 = hist(local_binary_pattern(GreyImage4))
-
+lbp4 = hist(local_binary_pattern("Swag2.png"))
+"""
 
 People = []
 People.append(GreyImage)
@@ -48,7 +48,7 @@ for x in range(len(Hists)):
         person = Labels[x]
 
 print(f"Person in image is: {person}, target was {Labels[0]}")
-
+"""
 
 
 # Remove if wanting to print the histograms

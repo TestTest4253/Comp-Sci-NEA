@@ -1,4 +1,4 @@
-from helper import local_binary_pattern, euclidean_distance, User_IDs, hist, backup_files
+from helper import local_binary_pattern, euclidean_distance, User_IDs, hist, backup_files, show_hist
 from RecognitionInImages import Detect_Face
 
 import os

@@ -3,6 +3,7 @@ import numpy as np
 import math
 from PIL import Image
 import cv2
+import matplotlib as plt
 
 # For the Datastore
 import os
@@ -202,3 +203,10 @@ def backup_files(storage, directory):
                 local_path = directory+"\\"+folder+"\\"+image
                 storage.child(cloud_path).put(local_path)
                 time.sleep(0.15)
+
+def show_hist(hist):
+    vals = range(len(hist))
+    plt.bar(vals, hist)
+    plt.axis = ("off")
+    plt.title("Person in Image")
+    plt.show()
