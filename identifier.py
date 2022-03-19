@@ -23,9 +23,11 @@ while True:
             colour = (255, 0, 0)
             stroke = 2
             cv2.rectangle(frame, (x, y), (x+w, y+h), colour, stroke)
-            img_item = "myimage"+str(num)+".png"
+            img_item = "Faces/James Watkin/myimage"+str(num)+".png"
             cv2.imwrite(img_item, roi_colour)
-            exit()
+            num += 1
+            if num == 99:
+                exit()
     # Displaying the frame
     cv2.imshow("frame", frame)
     if cv2.waitKey(100) == ord("q"):

@@ -1,5 +1,5 @@
 from helper import local_binary_pattern, euclidean_distance, User_IDs, hist, backup_files, show_hist
-from RecognitionInImages import Detect_Face
+from RecognitionInImages import add_face, identify_face, detect_face
 
 import os
 import urllib
@@ -28,7 +28,6 @@ path_of_gui = "Assets/"
 LOCAL_USER_IDS = "tmp/UserIDs.txt"
 CLOUD_USER_IDS = "Credentials/UserIDs.txt"
 FACES_DIRECTORY = "Faces"
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
 
 # Functions
 
@@ -71,6 +70,8 @@ def log_out(canvas2, test_recognition,
     get_started.lift()
 
 def facial_recognition(canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button):
+    global ADDING
+    ADDING = False
     tk.Misc.lift(canvas3, aboveThis=None)
     backup.lower()
     logout.lower()
@@ -80,6 +81,8 @@ def facial_recognition(canvas3, backup, logout, face_recognition, test_recogniti
     Stop_camera_button.lift()
 
 def add_user(first_name, last_name, canvas3, backup, logout, face_recognition, test_recognition, Start_camera_button, Stop_camera_button):
+    global ADDING
+    ADDING = True
     name = first_name.get().capitalize() + " " + last_name.get().capitalize()
     try:
         os.mkdir(f"Faces/{name}")
@@ -99,8 +102,11 @@ def start_button(videoloop_stop):
 
 def stop_button(videoloop_stop):
     videoloop_stop[0] = True
-    lbp = local_binary_pattern(f"Faces/{full_name}/myImage0.png")
-    histo = hist(lbp)
+    if ADDING == False:
+        lbp = local_binary_pattern("tmp/TestImage.png")
+        os.remove("tmp/TestImage.png")
+        histo = hist(lbp)
+        identify_face(histo, full_name)
 
 def videoLoop(mirror = False):
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -111,7 +117,10 @@ def videoLoop(mirror = False):
         _, frame = cap.read()
         if mirror == True:
             frame = frame[::-1]
-        Detect_Face(frame, full_name)
+        if ADDING == True:
+            add_face(frame, full_name)
+        else:
+            detect_face(frame)
         image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image = Image.fromarray(image) # PIL image format
         tkimage = ImageTk.PhotoImage(image) # Swapped to tkinter format

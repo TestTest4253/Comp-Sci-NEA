@@ -6,10 +6,8 @@ import cv2
 import matplotlib.pyplot as plt
 
 img = "Faces/Seb Atkins/myimage2.png"
-GreyImage = "Faces/Seb Atkins/myimage2.png"
-GreyImage2 = "Faces/James Watkin/myimage14.png"
-GreyImage3 = "Faces/Oscar White/myimage83.png"
-GreyImage4 = "Faces/Seb Atkins/myimage3.png"
+GreyImage = "tmp/TestImage.png"
+GreyImage2 = "Faces/Oscar White/myimage1.png"
 
 Labels = ["Seb", "James", "Oscar", "Seb"]
 Lowest_val = 1000000
@@ -25,8 +23,6 @@ plt.show()
 
 lbp1 = hist(local_binary_pattern(GreyImage))
 lbp2 = hist(local_binary_pattern(GreyImage2))
-lbp3 = hist(local_binary_pattern(GreyImage3))
-lbp4 = hist(local_binary_pattern("Swag2.png"))
 """
 
 People = []
@@ -54,9 +50,7 @@ print(f"Person in image is: {person}, target was {Labels[0]}")
 # Remove if wanting to print the histograms
 vals = range(len(lbp1))
 plt.figure(figsize=(10,8))
-plt.subplot(231); plt.bar(vals,lbp1); plt.title("Query"); plt.axis = ("off")
-plt.subplot(232); plt.bar(vals,lbp2); plt.title("Image #1"); plt.axis = ("off")
-plt.subplot(233); plt.bar(vals,lbp3); plt.title("Image #2"); plt.axis = ("off")
-plt.subplot(234); plt.bar(vals,lbp4); plt.title("Image #3 (Same person as query)"); plt.axis = ("off")
+plt.subplot(231); plt.bar(vals,lbp1); plt.title("Test"); plt.axis = ("off")
+#plt.subplot(232); plt.bar(vals,lbp2); plt.title("Oscar"); plt.axis = ("off")
 plt.show()
 
