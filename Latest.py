@@ -7,7 +7,6 @@ from tkinter import *
 import tkinter as tk
 import pyrebase
 import cv2
-import time
 import threading
 from PIL import Image, ImageTk
 

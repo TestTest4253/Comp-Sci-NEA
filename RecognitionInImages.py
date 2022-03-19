@@ -17,6 +17,19 @@ def add_face(img, user):
 		img_item = f"Faces/{user}/myImage0.png"
 		cv2.imwrite(img_item, roi_colour)
 
+"""
+def create_hists(user):
+	for x in os.listdir(f"Faces/{user}"):
+		if x == "histogram.txt":
+			continue
+		with open(f"Faces/{user}/histogram.txt", "w+") as file:
+			file.write(str(hist(local_binary_pattern(f"Faces/{user}/{x}"))))
+		break
+	with open(f"Faces/{user}/histogram.txt", "r") as file:
+		item = file.read()
+		print(np.fromstring(item, float))
+"""
+
 def identify_face(histogram, user):
 	Lowest_val = 1000000000000
 	query = histogram
