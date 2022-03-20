@@ -71,3 +71,33 @@ def detect_face(img):
 		cv2.rectangle(img, (x, y), (x+w, y+h), colour, stroke)
 		img_item = f"tmp/TestImage.png"
 		cv2.imwrite(img_item, roi_colour)
+
+def test_accuracy(query, user):
+	Lowest_value = 1000000
+	query_hist = hist(local_binary_pattern(query))
+	Person = []
+	Labels = []
+	Hists = []
+	for subject in os.listdir("yalefaces"):
+		Labels.append(subject)
+		for folder in os.listdir(f"yalefaces/{subject}"):
+			if folder == "Train":
+				for image in os.listdir(f"yalefaces/{subject}/{folder}"):
+					Person.append(hist(local_binary_pattern(f"yalefaces/{subject}/{folder}/{image}")))
+				Hists.append(Person)
+				Person = []
+
+	for x in range(len(Labels)):
+		for y in range(len(Hists)):
+			val = euclidean_distance(query_hist, Hists[x][y])
+			if val < Lowest_value:
+				Lowest_val = val
+				person = Labels[x]
+
+	print(f"Person is: {person}, person was meant to be: {user}")
+
+for subject in os.listdir("yalefaces"):
+	for folder in os.listdir(f"yalefaces/{subject}"):
+		if folder == "Test":
+			for image in os.listdir(f"yalefaces/{subject}/{folder}"):
+				test_accuracy(f"yalefaces/{subject}/{folder}/{image}", {subject})

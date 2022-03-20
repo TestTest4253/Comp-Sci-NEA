@@ -21,7 +21,7 @@ def local_binary_pattern(image):
         FinalArray {type: List[r,c]} Array of the LBP points for each pixel 
     """
 
-    image = cv2.cvtColor(np.array(Image.open(image), np.uint8) , cv2.COLOR_RGB2GRAY)
+    image = np.array(Image.open(image), np.uint8)
     Width, Height = math.ceil((len(image[0]))), math.ceil((len(image)))
     array = image.tolist()
     SingleRow, rows, Row, grids, LocalBinaryImageList, FinalArray = [], [], [], [], [], []
