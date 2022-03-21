@@ -17,18 +17,21 @@ def add_face(img, user):
 		img_item = f"Faces/{user}/myImage0.png"
 		cv2.imwrite(img_item, roi_colour)
 
-"""
-def create_hists(user):
-	for x in os.listdir(f"Faces/{user}"):
-		if x == "histogram.txt":
-			continue
-		with open(f"Faces/{user}/histogram.txt", "w+") as file:
-			file.write(str(hist(local_binary_pattern(f"Faces/{user}/{x}"))))
-		break
-	with open(f"Faces/{user}/histogram.txt", "r") as file:
-		item = file.read()
-		print(np.fromstring(item, float))
-"""
+def create_hists():
+	print("MAKING HISTS")
+	Lowest_value = 1000000
+	Person = []
+	Labels = []
+	Hists = []
+	for subject in os.listdir("yalefaces"):
+		Labels.append(subject)
+		for folder in os.listdir(f"yalefaces/{subject}"):
+			if folder == "Train":
+				for image in os.listdir(f"yalefaces/{subject}/{folder}"):
+					Person.append(hist(local_binary_pattern(f"yalefaces/{subject}/{folder}/{image}")))
+				Hists.append(Person)
+				Person = []
+	return Hists, Labels
 
 def identify_face(histogram, user):
 	Lowest_val = 1000000000000
@@ -72,32 +75,42 @@ def detect_face(img):
 		img_item = f"tmp/TestImage.png"
 		cv2.imwrite(img_item, roi_colour)
 
-def test_accuracy(query, user):
+def test_accuracy(query, user, Hists, Label):
 	Lowest_value = 1000000
 	query_hist = hist(local_binary_pattern(query))
-	Person = []
-	Labels = []
-	Hists = []
-	for subject in os.listdir("yalefaces"):
-		Labels.append(subject)
-		for folder in os.listdir(f"yalefaces/{subject}"):
-			if folder == "Train":
-				for image in os.listdir(f"yalefaces/{subject}/{folder}"):
-					Person.append(hist(local_binary_pattern(f"yalefaces/{subject}/{folder}/{image}")))
-				Hists.append(Person)
-				Person = []
+	Hist = Hists
+	Labels = Label
+	person = None
 
 	for x in range(len(Labels)):
-		for y in range(len(Hists)):
-			val = euclidean_distance(query_hist, Hists[x][y])
+		for y in range(len(Hist[0])):
+			val = euclidean_distance(query_hist, Hist[x][y])
 			if val < Lowest_value:
-				Lowest_val = val
+				Lowest_value = val
 				person = Labels[x]
 
 	print(f"Person is: {person}, person was meant to be: {user}")
+	if person == user:
+		global Correct
+		Correct += 1
+	global Total
+	Total += 1
+"""
+Made = 0
+global Correct
+Correct = 0
+global Total
+Total = 0
 
 for subject in os.listdir("yalefaces"):
 	for folder in os.listdir(f"yalefaces/{subject}"):
 		if folder == "Test":
 			for image in os.listdir(f"yalefaces/{subject}/{folder}"):
-				test_accuracy(f"yalefaces/{subject}/{folder}/{image}", {subject})
+				if Made == 0:
+					Hists, Labels = create_hists()
+					test_accuracy(f"yalefaces/{subject}/{folder}/{image}", subject, Hists, Labels)
+					Made = 1
+				else:
+					test_accuracy(f"yalefaces/{subject}/{folder}/{image}", subject, Hists, Labels)
+print(f"Final accuracy was {(Correct / Total) * 100}%")
+"""
