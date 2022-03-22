@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import os
 import time
+from PIL import Image
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
 
@@ -17,18 +18,18 @@ def add_face(img, user):
 		img_item = f"Faces/{user}/myImage0.png"
 		cv2.imwrite(img_item, roi_colour)
 
-def create_hists():
+def create_hists(Dataset):
 	print("MAKING HISTS")
 	Lowest_value = 1000000
 	Person = []
 	Labels = []
 	Hists = []
-	for subject in os.listdir("yalefaces"):
+	for subject in os.listdir(f"{Dataset}"):
 		Labels.append(subject)
-		for folder in os.listdir(f"yalefaces/{subject}"):
+		for folder in os.listdir(f"{Dataset}/{subject}"):
 			if folder == "Train":
-				for image in os.listdir(f"yalefaces/{subject}/{folder}"):
-					Person.append(hist(local_binary_pattern(f"yalefaces/{subject}/{folder}/{image}")))
+				for image in os.listdir(f"{Dataset}/{subject}/{folder}"):
+					Person.append(hist(local_binary_pattern(f"{Dataset}/{subject}/{folder}/{image}")))
 				Hists.append(Person)
 				Person = []
 	return Hists, Labels
@@ -95,22 +96,23 @@ def test_accuracy(query, user, Hists, Label):
 		Correct += 1
 	global Total
 	Total += 1
-"""
+
 Made = 0
 global Correct
 Correct = 0
 global Total
 Total = 0
+Dataset = "Facial"
 
-for subject in os.listdir("yalefaces"):
-	for folder in os.listdir(f"yalefaces/{subject}"):
+for subject in os.listdir(f"{Dataset}"):
+	for folder in os.listdir(f"{Dataset}/{subject}"):
 		if folder == "Test":
-			for image in os.listdir(f"yalefaces/{subject}/{folder}"):
+			for image in os.listdir(f"{Dataset}/{subject}/{folder}"):
 				if Made == 0:
-					Hists, Labels = create_hists()
-					test_accuracy(f"yalefaces/{subject}/{folder}/{image}", subject, Hists, Labels)
+					Hists, Labels = create_hists(Dataset)
+					test_accuracy(f"{Dataset}/{subject}/{folder}/{image}", subject, Hists, Labels)
 					Made = 1
 				else:
-					test_accuracy(f"yalefaces/{subject}/{folder}/{image}", subject, Hists, Labels)
+					test_accuracy(f"{Dataset}/{subject}/{folder}/{image}", subject, Hists, Labels)
 print(f"Final accuracy was {(Correct / Total) * 100}%")
-"""
+
