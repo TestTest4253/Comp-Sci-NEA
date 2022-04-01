@@ -4,56 +4,43 @@ import numpy as np
 import os
 import time
 from PIL import Image
+import ctypes
 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_alt2.xml")
 
-def add_face(img, user):
-	grey_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Converts image to greyscale to allow for better recognition
-	faces = face_cascade.detectMultiScale(grey_img, scaleFactor = 1.05, minNeighbors= 6, minSize = [30,30])
-	for (x, y, w, h) in faces:
-		roi_colour = img[y:y+h, x:x+w]
-		colour = (255, 0, 0)
-		stroke = 2
-		cv2.rectangle(img, (x, y), (x+w, y+h), colour, stroke)
-		img_item = f"Faces/{user}/myImage0.png"
-		cv2.imwrite(img_item, roi_colour)
-
 def create_hists(Dataset):
-	print("MAKING HISTS")
-	Lowest_value = 1000000
 	Person = []
-	Labels = []
-	Hists = []
 	for subject in os.listdir(f"{Dataset}"):
-		Labels.append(subject)
-		for folder in os.listdir(f"{Dataset}/{subject}"):
-			if folder == "Train":
-				for image in os.listdir(f"{Dataset}/{subject}/{folder}"):
-					Person.append(hist(local_binary_pattern(f"{Dataset}/{subject}/{folder}/{image}")))
-				Hists.append(Person)
-				Person = []
-	return Hists, Labels
+		made = False
+		num = 0
+		for photo in os.listdir(f"{Dataset}/{subject}"):
+			if photo.endswith(".txt"):
+				made = True
+		for photo in os.listdir(f"{Dataset}/{subject}"):
+			if made == False:
+				if photo.endswith(".png"):
+					num += 1
+					Person.append(hist(local_binary_pattern(f"Faces/{subject}/{photo}")))
+				if num == 10:
+					break
+		if made == False:
+			np.savetxt(f"Faces/{subject}/{subject}'s Hist.txt", Person)
+			Person = []	
 
 def identify_face(histogram, user):
 	Lowest_val = 1000000000000
 	query = histogram
-	Database = []
-	Person = []
-	Labels = []
 	start = time.time()
-	for x in os.listdir("Faces"):
-		num = 0
-		Labels.append(x)
-		for y in os.listdir(f"Faces/{x}"):
-			Person.append(hist(local_binary_pattern(f"Faces/{x}/{y}")))
-			num += 1
-			if num == 10:
-				break
-		Database.append(Person)
-		Person = []
+	Labels = []
+	Hists = []
+
+	for subject in os.listdir("Faces"):
+		Labels.append(subject)
+		Hists.append(np.loadtxt(f"Faces/{subject}/{subject}'s Hist.txt")) # Loads user's histogram from file path
+
 	for x in range(len(Labels)):
-		for y in range(len(Database)):
-			val = euclidean_distance(query, Database[x][y])
+		for y in range(len(Hists)):
+			val = euclidean_distance(query, Hists[x][y])
 			if val < Lowest_val:
 				Lowest_val = val
 				person = Labels[x]
@@ -63,11 +50,14 @@ def identify_face(histogram, user):
 		person = None
 	Correct = (person == user)
 	end = time.time()
-	print(f"Code guesses: Person is {person}, this guess was {Correct}, time taken: {end-start}")
+	ctypes.windll.user32.MessageBoxW(0, f"Person is {person}", "Guess", 1) # Displays popup window on the screen
 
 def detect_face(img):
-	grey_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Converts image to greyscale to allow for better recognition
-	faces = face_cascade.detectMultiScale(grey_img, scaleFactor = 1.05, minNeighbors= 6, minSize = [30,30])
+	try:
+		grey_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # Converts image to greyscale to allow for better recognition
+	except:
+		ctypes.windll.user32.MessageBoxW(0, "Error in assertion, please stop and restart camera", "WARNING", 1)
+	faces = face_cascade.detectMultiScale(grey_img, scaleFactor = 1.05, minNeighbors= 6, minSize = [30,30]) # Finds coords of user's face on the webcam
 	for (x, y, w, h) in faces:
 		roi_colour = img[y:y+h, x:x+w]
 		colour = (255, 0, 0)
@@ -75,44 +65,3 @@ def detect_face(img):
 		cv2.rectangle(img, (x, y), (x+w, y+h), colour, stroke)
 		img_item = f"tmp/TestImage.png"
 		cv2.imwrite(img_item, roi_colour)
-
-def test_accuracy(query, user, Hists, Label):
-	Lowest_value = 1000000
-	query_hist = hist(local_binary_pattern(query))
-	Hist = Hists
-	Labels = Label
-	person = None
-
-	for x in range(len(Labels)):
-		for y in range(len(Hist[0])):
-			val = euclidean_distance(query_hist, Hist[x][y])
-			if val < Lowest_value:
-				Lowest_value = val
-				person = Labels[x]
-
-	print(f"Person is: {person}, person was meant to be: {user}")
-	if person == user:
-		global Correct
-		Correct += 1
-	global Total
-	Total += 1
-
-Made = 0
-global Correct
-Correct = 0
-global Total
-Total = 0
-Dataset = "Facial"
-
-for subject in os.listdir(f"{Dataset}"):
-	for folder in os.listdir(f"{Dataset}/{subject}"):
-		if folder == "Test":
-			for image in os.listdir(f"{Dataset}/{subject}/{folder}"):
-				if Made == 0:
-					Hists, Labels = create_hists(Dataset)
-					test_accuracy(f"{Dataset}/{subject}/{folder}/{image}", subject, Hists, Labels)
-					Made = 1
-				else:
-					test_accuracy(f"{Dataset}/{subject}/{folder}/{image}", subject, Hists, Labels)
-print(f"Final accuracy was {(Correct / Total) * 100}%")
-

@@ -24,7 +24,7 @@ def local_binary_pattern(image):
         image = cv2.cvtColor(np.array(Image.open(image), np.uint8), cv2.COLOR_RGB2GRAY)
     except: 
         image = np.array(Image.open(image), np.uint8)
-    Width, Height = math.ceil((len(image[0]))), math.ceil((len(image)))
+    Height = math.ceil((len(image)))
     array = image.tolist()
     SingleRow, rows, Row, grids, LocalBinaryImageList, FinalArray = [], [], [], [], [], []
 
@@ -40,20 +40,18 @@ def local_binary_pattern(image):
         else:
             Row.append(SingleRow[x])
 
+    # Creates 2D array of the 3 rows
     for row in range(len(rows)):
         grids_row = []
         for column in range(len(rows)):
             grid = []
             grid.append(rows[row][column])
-            #print("First column added")
             try:
                 grid.append(rows[row + 1][column])
-                #print("Second column added")
             except IndexError:
                 grid.append([0] * 3)
             try:
                 grid.append(rows[row + 2][column])
-                #print("Third column added")
             except IndexError:
                 grid.append([0] * 3)
             grids_row.append(grid)
@@ -86,15 +84,17 @@ def local_binary_pattern(image):
                     if j == 1 and i == 1:
                         continue
                     else:
-                        if Grid[i][j] < Central:
-                            Binary += "0"
-                        else:
-                            Binary += "1"
-            #print(f"Binary for {Grid}: {Binary}")
+                        try:
+                            if Grid[i][j] < Central:
+                                Binary += "0"
+                            else:
+                                Binary += "1"
+                        except:
+                            print("[INFO] Error between lists and strings, rare occurence.")
             LocalBinaryImageList.append(int(Binary, 2))
 
     for x in range(0, len(LocalBinaryImageList), Height):
-        FinalArray.append(LocalBinaryImageList[x:x + Height])
+        FinalArray.append(LocalBinaryImageList[x:x + Height]) # Splitting long array into arrays of the length of the image
 
     return FinalArray
 
@@ -207,6 +207,12 @@ def backup_files(storage, directory):
                 time.sleep(0.15)
 
 def show_hist(hist):
+    """
+    Inputs:
+        np array of the histogram
+    Outputs:
+        Displays histogram visualisation of given array
+    """
     vals = range(len(hist))
     plt.bar(vals, hist)
     plt.axis = ("off")
